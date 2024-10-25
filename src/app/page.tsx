@@ -31,7 +31,7 @@ export default async function Home() {
             width={600}
             height={100}
             alt="Logo"
-            className="max-w-lg object-contain"
+            className="max-w-lg  object-contain"
           />
           <p className="text-center max-w-[500px]">
             Your AI powered sales assistant! Embed Quinn AI into any website
