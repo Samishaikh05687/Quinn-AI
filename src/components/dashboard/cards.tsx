@@ -15,7 +15,7 @@ const DashboardCard = ({ icon, title, value, sales }: Props) => {
         <h2 className="font-bold text-xl">{title}</h2>
       </div>
       <p className="font-bold text-4xl">
-        {sales && '$'}
+        {sales && '₹'}
         {value}
       </p>
     </div>

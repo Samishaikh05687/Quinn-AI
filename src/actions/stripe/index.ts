@@ -6,7 +6,7 @@ import Stripe from 'stripe'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET!, {
   typescript: true,
-  apiVersion: '2024-09-30',
+  apiVersion: '2024-09-30.acacia',
 })
 
 export const onCreateCustomerPaymentIntentSecret = async (

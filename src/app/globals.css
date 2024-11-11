@@ -85,48 +85,51 @@ body {
 
 @layer base {
   * {
-    @apply border-border;
+    border-color: var(--border);
   }
   body {
-    @apply bg-background text-foreground;
+    background-color: var(--background);
+    color: var(--foreground);
   }
 }
 
 .chat-bubble {
   background-color: #f1f1f1;
   padding: 16px 28px;
-  -webkit-border-t-radius: 10px;
-  -webkit-border-bottom-left-radius: 2px;
-  -moz-border-t-radius: 10px;
-  -moz-border-radius-bottomleft: 2px;
-  border-radius: 10px;
+  border-top-right-radius: 10px;
+  border-top-left-radius: 10px;
   border-bottom-left-radius: 2px;
   display: inline-block;
 }
+
 .typing {
   align-items: center;
   display: flex;
   height: 17px;
 }
+
 .typing .dot {
   animation: mercuryTypingAnimation 1.8s infinite ease-in-out;
   background-color: #ffc989;
   border-radius: 50%;
   height: 7px;
   margin-right: 4px;
-  vertical-align: middle;
   width: 7px;
   display: inline-block;
 }
+
 .typing .dot:nth-child(1) {
   animation-delay: 200ms;
 }
+
 .typing .dot:nth-child(2) {
   animation-delay: 300ms;
 }
+
 .typing .dot:nth-child(3) {
   animation-delay: 400ms;
 }
+
 .typing .dot:last-child {
   margin-right: 0;
 }

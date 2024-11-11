@@ -48,7 +48,6 @@ const Layout = async ({ children }: Props) => {
         />
       </div>
     </div>
-
   )
 }
 
