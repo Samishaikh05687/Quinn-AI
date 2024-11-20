@@ -7,9 +7,16 @@ import { clerkClient } from '@clerk/nextjs'
 import { onMailer } from '../mailer'
 import OpenAi from 'openai'
 
+import{CohereClientV2} from 'cohere-ai'
+
+
 const openai = new OpenAi({
-  apiKey: process.env.OPEN_AI_KEY,
+  apiKey: process.env.NEXT_PUBLIC_OPEN_AI_KEY,
 })
+
+const cohere = new CohereClientV2({
+  token: process.env.NEXT_PUBLIC_COHERE_API_KEY,
+});
 
 export const onStoreConversations = async (
   id: string,
@@ -205,7 +212,8 @@ export const onAiChatBotAssistant = async (
           author
         )
 
-        const chatCompletion = await openai.chat.completions.create({
+        const chatCompletion = await cohere.chat({
+          model: 'command-r-plus',
           messages: [
             {
               role: 'assistant',
@@ -243,11 +251,12 @@ export const onAiChatBotAssistant = async (
               content: message,
             },
           ],
-          model: 'gpt-3.5-turbo',
-        })
+          
 
-        if (chatCompletion.choices[0].message.content?.includes('(realtime)')) {
-          const realtime = await client.chatRoom.update({
+        })
+        const content = chatCompletion.message?.content?.[0]?.text;
+        if (content?.includes('(realtime)')) {
+           const realtime = await client.chatRoom.update({
             where: {
               id: checkCustomer?.customer[0].chatRoom[0].id,
             },
@@ -255,25 +264,31 @@ export const onAiChatBotAssistant = async (
               live: true,
             },
           })
+          
+            if (realtime) {
+             
+         if (chatCompletion?.message?.content && Array.isArray(chatCompletion.message.content)) {
+     
+         const combinedContent = chatCompletion.message.content.map((textObj) => textObj.text).join(' ');
 
-          if (realtime) {
-            const response = {
-              role: 'assistant',
-              content: chatCompletion.choices[0].message.content.replace(
-                '(realtime)',
-                ''
-              ),
+                const response = {
+                  role: 'assistant',
+                  content: combinedContent.replace('(realtime)', ''
+
+                  ),
+                };
+                await onStoreConversations(
+                  checkCustomer?.customer[0].chatRoom[0].id!,
+                  response.content,
+                  'assistant'
+                )
+        
+                return { response }
+              } 
             }
-
-            await onStoreConversations(
-              checkCustomer?.customer[0].chatRoom[0].id!,
-              response.content,
-              'assistant'
-            )
-
-            return { response }
           }
-        }
+          
+          
         if (chat[chat.length - 1].content.includes('(complete)')) {
           const firstUnansweredQuestion =
             await client.customerResponses.findFirst({
@@ -300,54 +315,61 @@ export const onAiChatBotAssistant = async (
           }
         }
 
-        if (chatCompletion) {
-          const generatedLink = extractURLfromString(
-            chatCompletion.choices[0].message.content as string
-          )
-
-          if (generatedLink) {
-            const link = generatedLink[0]
+        if (chatCompletion?.message?.content && Array.isArray(chatCompletion.message.content)) {
+          // Combine content into a single string
+          const combinedContent = chatCompletion.message.content.map((textObj) => textObj.text).join(' ');
+        
+          // Extract URL from the combined content
+          const generatedLink = extractURLfromString(combinedContent);
+        
+          if (generatedLink && generatedLink.length > 0) {
+            const link = generatedLink[0];
+        
             const response = {
               role: 'assistant',
-              content: `Great! you can follow the link to proceed`,
-              link: link.slice(0, -1),
-            }
-
+              content: `Great! You can follow the link to proceed`,
+              link: link.slice(0, -1), // Remove the last character if necessary
+            };
+        
+            // Store conversation with assistant response
             await onStoreConversations(
               checkCustomer?.customer[0].chatRoom[0].id!,
               `${response.content} ${response.link}`,
               'assistant'
-            )
-
-            return { response }
+            );
+        
+            return { response };
           }
-
+        
           const response = {
             role: 'assistant',
-            content: chatCompletion.choices[0].message.content,
-          }
-
+            content: combinedContent,
+          };
+        
+          // Store conversation without link
           await onStoreConversations(
             checkCustomer?.customer[0].chatRoom[0].id!,
             `${response.content}`,
             'assistant'
-          )
-
-          return { response }
+          );
+        
+          return { response };
+        } else {
+          throw new Error('chatCompletion.message.content is undefined or not an array');
         }
+        
       }
       console.log('No customer')
-      const chatCompletion = await openai.chat.completions.create({
+      const response = await cohere.chat({
+        model: 'command-r-plus',
         messages: [
           {
             role: 'assistant',
             content: `
-            You are a highly knowledgeable and experienced sales representative for a ${chatBotDomain.name} that offers a valuable product or service. Your goal is to have a natural, human-like conversation with the customer in order to understand their needs, provide relevant information, and ultimately guide them towards making a purchase or redirect them to a link if they havent provided all relevant information.
-            Right now you are talking to a customer for the first time. Start by giving them a warm welcome on behalf of ${chatBotDomain.name} and make them feel welcomed.
-
-            Your next task is lead the conversation naturally to get the customers email address. Be respectful and never break character
-
-          `,
+                  You are a highly knowledgeable and experienced sales representative for a ${chatBotDomain.name} that offers a valuable product or service. Your goal is to have a natural, human-like conversation with the customer in order to understand their needs, provide relevant information, and ultimately guide them towards making a purchase or redirect them to a link if they havent provided all relevant information.
+                  Right now you are talking to a customer for the first time. Start by giving them a warm welcome on behalf of ${chatBotDomain.name} and make them feel welcomed.
+                  Your next task is lead the conversation naturally to get the customers email address. Be respectful and never break character
+             `,
           },
           ...chat,
           {
@@ -355,17 +377,44 @@ export const onAiChatBotAssistant = async (
             content: message,
           },
         ],
-        model: 'gpt-3.5-turbo',
-      })
-
-      if (chatCompletion) {
-        const response = {
-          role: 'assistant',
-          content: chatCompletion.choices[0].message.content,
-        }
-
-        return { response }
+      });
+      if (response.message?.content && response.message.content[0]?.text) {
+        const assistantMessage = response.message.content[0].text;
+        console.log('Assistant Message:', assistantMessage);
+        return {assistantMessage}
+      } else {
+        console.error('Error: Response message or content is undefined.');
       }
+      // const chatCompletion = await cohere.chat({
+      //   model: 'command-r-plus',
+      //   messages: [
+      //     {
+      //       role: 'assistant',
+      //       content: `
+      //       You are a highly knowledgeable and experienced sales representative for a ${chatBotDomain.name} that offers a valuable product or service. Your goal is to have a natural, human-like conversation with the customer in order to understand their needs, provide relevant information, and ultimately guide them towards making a purchase or redirect them to a link if they havent provided all relevant information.
+      //       Right now you are talking to a customer for the first time. Start by giving them a warm welcome on behalf of ${chatBotDomain.name} and make them feel welcomed.
+
+      //       Your next task is lead the conversation naturally to get the customers email address. Be respectful and never break character
+
+      //     `,
+      //     },
+      //     ...chat,
+      //     {
+      //       role: 'user',
+      //       content: message,
+      //     },
+      //   ],
+        
+      // })
+      // const  assistantMessage = chatCompletion.message?.content[1].text;
+      // if (chatCompletion) {
+      //   const response = {
+      //     role: 'assistant',
+      //     content: chatCompletion.message.content[1].text,
+      //   }
+
+      //   return { response }
+      // }
     }
   } catch (error) {
     console.log(error)

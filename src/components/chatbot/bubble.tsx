@@ -16,8 +16,13 @@ type Props = {
 
 const Bubble = ({ message, createdAt }: Props) => {
   let d = new Date()
+  if (!message || !message.content) {
+    console.error('Error: Message or its content is undefined');
+    return null; // Or return a fallback UI
+  }
+
   const image = extractUUIDFromString(message.content)
-  console.log(message.link)
+  console.log(message.link ?? 'No link provided');
 
   return (
     <div
