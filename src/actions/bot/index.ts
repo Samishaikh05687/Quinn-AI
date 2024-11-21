@@ -5,14 +5,11 @@ import { extractEmailsFromString, extractURLfromString } from '@/lib/utils'
 import { onRealTimeChat } from '../conversation'
 import { clerkClient } from '@clerk/nextjs'
 import { onMailer } from '../mailer'
-import OpenAi from 'openai'
+
 
 import{CohereClientV2} from 'cohere-ai'
 
 
-const openai = new OpenAi({
-  apiKey: process.env.NEXT_PUBLIC_OPEN_AI_KEY,
-})
 
 const cohere = new CohereClientV2({
   token: process.env.NEXT_PUBLIC_COHERE_API_KEY,
@@ -385,36 +382,7 @@ export const onAiChatBotAssistant = async (
       } else {
         console.error('Error: Response message or content is undefined.');
       }
-      // const chatCompletion = await cohere.chat({
-      //   model: 'command-r-plus',
-      //   messages: [
-      //     {
-      //       role: 'assistant',
-      //       content: `
-      //       You are a highly knowledgeable and experienced sales representative for a ${chatBotDomain.name} that offers a valuable product or service. Your goal is to have a natural, human-like conversation with the customer in order to understand their needs, provide relevant information, and ultimately guide them towards making a purchase or redirect them to a link if they havent provided all relevant information.
-      //       Right now you are talking to a customer for the first time. Start by giving them a warm welcome on behalf of ${chatBotDomain.name} and make them feel welcomed.
-
-      //       Your next task is lead the conversation naturally to get the customers email address. Be respectful and never break character
-
-      //     `,
-      //     },
-      //     ...chat,
-      //     {
-      //       role: 'user',
-      //       content: message,
-      //     },
-      //   ],
-        
-      // })
-      // const  assistantMessage = chatCompletion.message?.content[1].text;
-      // if (chatCompletion) {
-      //   const response = {
-      //     role: 'assistant',
-      //     content: chatCompletion.message.content[1].text,
-      //   }
-
-      //   return { response }
-      // }
+     
     }
   } catch (error) {
     console.log(error)
