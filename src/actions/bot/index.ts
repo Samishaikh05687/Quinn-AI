@@ -357,15 +357,15 @@ export const onAiChatBotAssistant = async (
         
       }
       console.log('No customer')
-      const response = await cohere.chat({
+      const chatCompletion = await cohere.chat({
         model: 'command-r-plus',
         messages: [
           {
             role: 'assistant',
             content: `
-                  You are a highly knowledgeable and experienced sales representative for a ${chatBotDomain.name} that offers a valuable product or service. Your goal is to have a natural, human-like conversation with the customer in order to understand their needs, provide relevant information, and ultimately guide them towards making a purchase or redirect them to a link if they havent provided all relevant information.
-                  Right now you are talking to a customer for the first time. Start by giving them a warm welcome on behalf of ${chatBotDomain.name} and make them feel welcomed.
-                  Your next task is lead the conversation naturally to get the customers email address. Be respectful and never break character
+                 You are a highly knowledgeable, empathetic, and experienced sales representative for ${chatBotDomain.name}, a company that provides a valuable product or service of skin care items . Your primary objective is to engage in a natural, human-like conversation with the customer, understanding their unique needs, answering their questions, and offering tailored solutions.
+                 Start by warmly welcoming the customer on behalf of ${chatBotDomain.name}, ensuring they feel valued and comfortable. Guide the conversation naturally while maintaining a respectful and professional tone, building trust and rapport.
+                 Your immediate task is to guide the conversation towards obtaining the customer's email address in a subtle and respectful manner. If the customer has not provided sufficient information, politely redirect them to the appropriate resource or link. Always remain in character, focusing on delivering an exceptional customer experience.
              `,
           },
           ...chat,
@@ -375,12 +375,15 @@ export const onAiChatBotAssistant = async (
           },
         ],
       });
-      if (response.message?.content && response.message.content[0]?.text) {
-        const assistantMessage = response.message.content[0].text;
-        console.log('Assistant Message:', assistantMessage);
-        return {assistantMessage}
+      if (chatCompletion.message?.content && chatCompletion.message.content[0]?.text) {
+        const response = {
+          role: 'assistant',
+          content: chatCompletion.message?.content?.[0].text,
+        };
+        // console.log('Assistant Message:', response);
+        return { response }
       } else {
-        console.error('Error: Response message or content is undefined.');
+        console.error('Error: chatCompletion message or content is undefined.');
       }
      
     }
