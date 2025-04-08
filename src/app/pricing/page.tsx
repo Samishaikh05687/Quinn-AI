@@ -24,7 +24,7 @@ const PricingPage = () => {
       <div className="text-center mb-10">
         <h2 className="text-5xl font-bold text-gray-800">Choose Your Perfect Plan</h2>
         <p className="mt-4 text-lg text-gray-600 max-w-xl mx-auto">
-          Our pricing plans are designed to fit your needs, whether youre just getting started or looking for advanced features. Select a plan that suits you best and get started on your journey with us!
+          Our pricing plans are designed to fit your needs, whether you&#39;re just getting started or looking for advanced features. Select a plan that suits you best and get started on your journey with us!
         </p>
       </div>
 
@@ -38,7 +38,7 @@ const PricingPage = () => {
             })}
           >
             <CardHeader>
-              <CardTitle className="text-orange">{card.title}</CardTitle>
+              <CardTitle className="text-orange-500">{card.title}</CardTitle>
               <CardDescription>
                 {pricingCards.find((c) => c.title === card.title)?.description}
               </CardDescription>
@@ -46,7 +46,7 @@ const PricingPage = () => {
             <CardContent>
               <span className="text-4xl font-bold">{card.price}</span>
               <span className="text-muted-foreground">
-                <span>/ month</span>
+                <span>/month</span>
               </span>
             </CardContent>
             <CardFooter className="flex flex-col items-start gap-4">
