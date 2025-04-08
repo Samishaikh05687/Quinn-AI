@@ -18,7 +18,7 @@ const blogPosts: BlogPost[] = [
   {
     title: "The Future of Machine Learning in Business",
     date: "October 20, 2024",
-    description: "A look into machine learning’s role in business, from predictive analytics to intelligent automation.",
+    description: "A look into machine learnings role in business, from predictive analytics to intelligent automation.",
     imageUrl: "/images//blog-post-3.jpg",
   },
   {
