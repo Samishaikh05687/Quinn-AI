@@ -40,10 +40,10 @@ export async function GET() {
         },
         company: {
           address: {
-            city: 'Dewas',
-            line1: 'Main market',
-            postal_code: '455001',
-            state: 'MP',
+            city: 'Fairfax',
+            line1: '123 State St',
+            postal_code: '22031',
+            state: 'VA',
           },
           tax_id: '000000000',
           name: 'The Best Cookie Co',
@@ -52,8 +52,8 @@ export async function GET() {
       })
       if (approve) {
         const person = await stripe.accounts.createPerson(account.id, {
-          first_name: 'Sammi',
-          last_name: 'shaikh',
+          first_name: 'Jenny',
+          last_name: 'Rosen',
           relationship: {
             representative: true,
             title: 'CEO',
