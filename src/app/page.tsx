@@ -87,7 +87,7 @@ export default async function Home() {
       </h2>
       <p className="text-muted-foreground text-center max-w-lg text-lg">
         Our straightforward pricing plans are tailored to meet your needs. If
-        you're not ready to commit, you can get started for free.
+        you&#39;re not ready to commit, you can get started for free.
       </p>
 
       <div className="flex justify-center gap-6 mt-10 mb-10">
